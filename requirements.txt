@@ -7,8 +7,6 @@ numpy
 requests
 scikit-learn
 sentence-transformers
-<<<<<<< HEAD
-=======
+gunicorn
 db-sqlite3
->>>>>>> d1ef2518016eeb60ff682b6007a2df31a18cbb27
 Werkzeug
