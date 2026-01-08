@@ -3,6 +3,7 @@ This chat bot helps you understand your mental health issue and understands your
 
 A conversational AI assistant that provides empathetic, context‑aware mental‑health support. Built with **Retrieval‑Augmented Generation (RAG)**, the bot can pull relevant information from a curated dataset to enrich its responses, ensuring users receive accurate and helpful guidance.
 
+Try our Project here - https://mental-health-chatbot-jiy2.onrender.com
 
 ## A Demo 
 ![Demo Screenshot](static/Screenshot.png)
