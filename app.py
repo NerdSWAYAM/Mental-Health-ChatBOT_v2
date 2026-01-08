@@ -18,6 +18,10 @@ app = Flask(__name__)
 def index():
     return render_template('home.html')
 
+@app.route('/health')
+def health_check():
+    return "OK", 200
+
 @app.route('/about')
 def about():
     return render_template('About.html')
@@ -69,10 +73,11 @@ def login_api():
         return jsonify({'message': message}), 200
     else:
         return jsonify({'error': message}), 401
-
+# ========
 @app.route('/chat')
 def chat():
     return render_template('chatbot.html')
+
 
 @app.route('/api/chat', methods=['POST'])
 def chat_api():
@@ -91,4 +96,7 @@ def chat_api():
 
 if __name__ == '__main__':
     init_db()
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
+    # To run with gunicorn, use the terminal: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 1
+

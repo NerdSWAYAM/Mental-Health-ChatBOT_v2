@@ -1,12 +1,9 @@
 flask
 dotenv
 Flask
-huggingface-hub
-Jinja2
-numpy
 requests
 scikit-learn
-sentence-transformers
+numpy
+gunicorn
 db-sqlite3
 Werkzeug
-gunicorn
