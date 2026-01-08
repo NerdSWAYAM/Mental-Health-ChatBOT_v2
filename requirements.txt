@@ -7,4 +7,5 @@ numpy
 requests
 scikit-learn
 sentence-transformers
+db-sqlite3
 Werkzeug
