@@ -6,6 +6,7 @@ from model.rag import retrieve_response
 from model.db import init_db, add_user, authenticate_user 
 # from sentence_transformers import SentenceTransformer
 
+
 load_dotenv()
 
 # print("Loading model...")
@@ -28,6 +29,7 @@ def features():
 @app.route('/emergency')
 def emergency():
     return render_template('phone.html')
+
 
 @app.route('/login')
 def login():

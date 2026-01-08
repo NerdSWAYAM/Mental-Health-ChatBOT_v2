@@ -33,9 +33,11 @@ cd Mental-Health-ChatBOT_v2
 ```bash
 # Create a virtual environment (optional but recommended)
 python3 -m venv venv
-
+```
+```bash
 source venv/bin/activate # For Linux / Mac Users
-
+```
+```bash
 venv\Script\activate # For Windows Users
 ```
 
@@ -53,7 +55,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Open your browser and visit **http://127.0.0.1:5000**. You’ll be greeted by a sleek chat interface where you can start a conversation.
+Open your browser and visit **http://127.0.0.1:5500**. You’ll be greeted by a sleek chat interface where you can start a conversation.
 
 ---
 
@@ -64,5 +66,12 @@ This project is licensed under the **MIT License** – see the `LICENSE` file fo
 
 ---
 
+Developed by
+-Prajwal Naik [https://github.com/Prajwalnaik4563]
+
+
+-Swayam Kesarkar [https://github.com/LightYagami625]
+
 
 *Created on 2025‑12‑15*
+# Mental-Health-ChatBOT_v1
