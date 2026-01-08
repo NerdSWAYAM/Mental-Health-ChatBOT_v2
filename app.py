@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 import os
 # from model.model import generate_mental_health_response
-from model.rag import retrieve_response 
+from model.rag import retrieve_response
+from model.db import init_db, add_user, authenticate_user 
 # from sentence_transformers import SentenceTransformer
 
 
@@ -34,6 +35,41 @@ def emergency():
 def login():
     return render_template('login.html')
 
+@app.route('/api/signup', methods=['POST'])
+def signup_api():
+    data = request.json
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    email = data.get('email')
+    password = data.get('password')
+
+    if not all([first_name, last_name, email, password]):
+        return jsonify({'error': 'All fields are required'}), 400
+
+    success, message = add_user(first_name, last_name, email, password)
+    if success:
+        return jsonify({'message': message}), 201
+    else:
+        # If user exists, we return 409 Conflict, but frontend can handle it
+        if "exists" in message:
+            return jsonify({'error': message}), 409
+        return jsonify({'error': message}), 500
+
+@app.route('/api/login', methods=['POST'])
+def login_api():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email and password are required'}), 400
+
+    success, message = authenticate_user(email, password)
+    if success:
+        return jsonify({'message': message}), 200
+    else:
+        return jsonify({'error': message}), 401
+
 @app.route('/chat')
 def chat():
     return render_template('chatbot.html')
@@ -54,4 +90,5 @@ def chat_api():
         return jsonify({'error': 'Failed to generate response'}), 500
 
 if __name__ == '__main__':
+    init_db()
     app.run(debug=True, port=5000)
