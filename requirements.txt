@@ -1,4 +1,10 @@
 flask
 dotenv
+Flask
+huggingface-hub
+Jinja2
+numpy
+requests
 scikit-learn
-sentence_transformers
+sentence-transformers
+Werkzeug
