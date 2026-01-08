@@ -517,20 +517,41 @@
     const chatHistory = [{ role: 'assistant', text: "Hi — I'm here to listen. What's on your mind?", time: new Date().toLocaleTimeString() }];
 
     // Render helpers
-    function escapeHtml(text) {
-      return String(text).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
-    }
-    function createBubble(m) {
+    async function appendMessage(m, animate = false) {
       const div = document.createElement('div');
       div.className = 'bubble ' + m.role;
-      div.innerHTML = `<div>${escapeHtml(m.text)}</div><div class="meta">${escapeHtml(m.time)}</div>`;
-      return div;
-    }
-    function renderMessages() {
-      messagesEl.innerHTML = '';
-      for (const m of chatHistory) messagesEl.appendChild(createBubble(m));
+
+      const textDiv = document.createElement('div');
+      const metaDiv = document.createElement('div');
+      metaDiv.className = 'meta';
+      metaDiv.textContent = m.time;
+
+      div.appendChild(textDiv);
+      div.appendChild(metaDiv);
+      messagesEl.appendChild(div);
+
       scrollToBottom();
+
+      if (animate) {
+        const words = m.text.split(" ");
+        let currentText = "";
+        for (const word of words) {
+          currentText += word + " ";
+          textDiv.textContent = currentText;
+          scrollToBottom();
+          await new Promise(r => setTimeout(r, 100)); // Adjust speed here (ms)
+        }
+      } else {
+        textDiv.textContent = m.text;
+      }
     }
+
+    // Initialize History
+    function initMessages() {
+      messagesEl.innerHTML = '';
+      chatHistory.forEach(m => appendMessage(m, false));
+    }
+
     function scrollToBottom({ smooth = false } = {}) {
       try {
         if (smooth) messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
@@ -573,7 +594,7 @@
       // push user
       const userMsg = { role: 'user', text, time: new Date().toLocaleTimeString() };
       chatHistory.push(userMsg);
-      renderMessages();
+      appendMessage(userMsg, false); // Render user message instantly
       input.value = '';
 
       // show typing
@@ -603,12 +624,18 @@
         }
 
         hideTypingIndicator();
-        chatHistory.push({ role: 'assistant', text: replyText, time: new Date().toLocaleTimeString() });
-        renderMessages();
+
+        const assistantMsg = { role: 'assistant', text: replyText, time: new Date().toLocaleTimeString() };
+        chatHistory.push(assistantMsg);
+
+        // Format and render with animation
+        await appendMessage(assistantMsg, true);
+
       } catch (err) {
         hideTypingIndicator();
-        chatHistory.push({ role: 'assistant', text: "Sorry — something went wrong. Please try again.", time: new Date().toLocaleTimeString() });
-        renderMessages();
+        const errorMsg = { role: 'assistant', text: "Sorry — something went wrong. Please try again.", time: new Date().toLocaleTimeString() };
+        chatHistory.push(errorMsg);
+        appendMessage(errorMsg, false);
         console.error(err);
       } finally {
         isSending = false;
@@ -728,7 +755,7 @@
 
     // init
     setupSpeech();
-    renderMessages();
+    initMessages();
 
     // expose for debugging
     window.mindcare = { chatHistory, sendMessage };

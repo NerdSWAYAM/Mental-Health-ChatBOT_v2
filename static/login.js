@@ -93,7 +93,7 @@ togglePass2.addEventListener("click", () => {
 /* =====================================================
    SIGNUP LOGIC (SAVE USER)
 ===================================================== */
-createAccountBtn.addEventListener("click", () => {
+createAccountBtn.addEventListener("click", async () => {
   const first = signupFirst.value.trim();
   const last = signupLast.value.trim();
   const email = signupEmail.value.trim();
@@ -114,24 +114,62 @@ createAccountBtn.addEventListener("click", () => {
     return;
   }
 
-  // Save user (demo purpose)
-  const user = { email, password };
-  localStorage.setItem("user", JSON.stringify(user));
+  createAccountBtn.classList.add("loading");
+  createAccountBtn.textContent = "Creating...";
 
-  signupMsg.textContent = "Account created successfully ✔";
-  signupMsg.classList.add("success");
+  try {
+    const response = await fetch('/api/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        first_name: first,
+        last_name: last,
+        email: email,
+        password: password
+      }),
+    });
 
-  setTimeout(() => {
-    signupForm.reset();
-    btnLogin.click();
-    signupMsg.textContent = "";
-  }, 1000);
+    const data = await response.json();
+
+    if (response.ok) {
+      signupMsg.textContent = "Account created successfully ✔";
+      signupMsg.classList.add("success");
+      setTimeout(() => {
+        signupForm.reset();
+        btnLogin.click();
+        signupMsg.textContent = "";
+        createAccountBtn.classList.remove("loading");
+        createAccountBtn.textContent = "Create account";
+      }, 1000);
+    } else {
+      if (response.status === 409) {
+        signupMsg.textContent = "Account already exists! Please login.";
+        signupMsg.classList.add("error");
+        // Optional: Redirect to login immediately if that's what "accept them" implies
+        // For now, let's just tell them.
+      } else {
+        signupMsg.textContent = data.error || "Signup failed.";
+        signupMsg.classList.add("error");
+      }
+      createAccountBtn.classList.remove("loading");
+      createAccountBtn.textContent = "Create account";
+    }
+
+  } catch (error) {
+    console.error('Error:', error);
+    signupMsg.textContent = "An error occurred. Please try again.";
+    signupMsg.classList.add("error");
+    createAccountBtn.classList.remove("loading");
+    createAccountBtn.textContent = "Create account";
+  }
 });
 
 /* =====================================================
    LOGIN VALIDATION (STRICT)
 ===================================================== */
-loginForm.addEventListener("submit", (e) => {
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const email = loginEmail.value.trim();
@@ -146,34 +184,43 @@ loginForm.addEventListener("submit", (e) => {
     return;
   }
 
-  const savedUser = JSON.parse(localStorage.getItem("user"));
-
-  if (!savedUser) {
-    loginMsg.textContent = "No account found. Please sign up first.";
-    loginMsg.classList.add("error");
-    return;
-  }
-
-  if (email !== savedUser.email || password !== savedUser.password) {
-    loginMsg.textContent = "❌ Invalid email or password.";
-    loginMsg.classList.add("error");
-    return;
-  }
-
   signinBtn.classList.add("loading");
   signinBtn.textContent = "Signing in…";
 
-  setTimeout(() => {
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      loginMsg.textContent = "✅ Login successful. Redirecting…";
+      loginMsg.classList.add("success");
+
+      setTimeout(() => {
+        signinBtn.classList.remove("loading");
+        signinBtn.textContent = "Sign in";
+        window.location.href = "/chat";
+      }, 900);
+    } else {
+      loginMsg.textContent = `❌ ${data.error || 'Login failed'}`;
+      loginMsg.classList.add("error");
+      signinBtn.classList.remove("loading");
+      signinBtn.textContent = "Sign in";
+    }
+
+  } catch (error) {
+    console.error('Error:', error);
+    loginMsg.textContent = "An error occurred. Please try again.";
+    loginMsg.classList.add("error");
     signinBtn.classList.remove("loading");
     signinBtn.textContent = "Sign in";
-
-    loginMsg.textContent = "✅ Login successful. Redirecting…";
-    loginMsg.classList.add("success");
-
-    setTimeout(() => {
-      window.location.href = "/chat";
-    }, 900);
-  }, 1200);
+  }
 });
 
 /* =====================================================
