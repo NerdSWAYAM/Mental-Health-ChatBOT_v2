@@ -18,6 +18,10 @@ app = Flask(__name__)
 def index():
     return render_template('home.html')
 
+@app.route('/health')
+def health_check():
+    return "OK", 200
+
 @app.route('/about')
 def about():
     return render_template('About.html')
